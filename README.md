@@ -2,7 +2,7 @@
 
 ELDEN RING NIGHTREIGN の配信でよく出てくる用語を、わんコメの読み上げが正しく読めるようにするためのクラウドユーザー辞書です。
 
-現在 207 語収録（`nightreign.json`）。
+現在 208 語収録（`nightreign.json`）。
 
 ## 使い方（わんコメ側の設定）
 
