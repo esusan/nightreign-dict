@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ナイトレイン読み上げ辞書</title>
+<meta name="description" content="ELDEN RING NIGHTREIGN の配信でよく出る用語を、わんコメの読み上げが正しく読めるようにするクラウドユーザー辞書です。">
+<!-- リンクカード用 -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="ナイトレイン読み上げ辞書｜わんコメ用クラウドユーザー辞書">
+<meta property="og:description" content="ナイトレインの配信でよく出る用語を、わんコメの読み上げが正しく読めるようにする辞書です。URLを登録するだけで使えます。">
+<meta property="og:url" content="https://esusan.github.io/nightreign-dict/">
+<meta name="twitter:card" content="summary">
+<style>
+  :root {
+    --bg: #14161a;
+    --panel: #1d2026;
+    --line: #2e333b;
+    --text: #e8eaee;
+    --muted: #9aa1ab;
+    --accent: #3ee8f0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Noto Sans JP", "Yu Gothic UI", "Hiragino Sans", sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  main { max-width: 820px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 40px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  p { margin: 0 0 12px; }
+  .lead { color: var(--muted); margin-bottom: 16px; }
+  .count { color: var(--text); }
+  .count b { color: var(--accent); font-variant-numeric: tabular-nums; }
+  a { color: var(--accent); }
+  code { background: var(--panel); padding: 1px 6px; border-radius: 4px; font-size: .92em; word-break: break-all; }
+
+  .steps { padding-left: 1.4em; margin: 0; }
+  .steps > li { margin-bottom: 28px; }
+  .steps > li > p { margin: 0 0 10px; }
+  .shot {
+    display: block;
+    width: 520px;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  .hint { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+
+  .urlbox {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .urlbox input {
+    flex: 1 1 320px;
+    min-width: 0;
+    background: #0f1114;
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font: 14px/1.4 ui-monospace, Consolas, monospace;
+  }
+  button {
+    background: var(--accent);
+    color: #071214;
+    border: 0;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .copied { color: var(--accent); margin-left: 4px; font-size: 13px; }
+
+  dt { font-weight: 700; margin-top: 14px; }
+  dd { margin: 4px 0 0; color: var(--muted); }
+
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12.5px; line-height: 1.8; }
+  footer p { margin: 12px 0 0; }
+  .foot-links { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 36px; }
+  .foot-label { width: 8em; text-align: center; padding: 2px 8px; font-size: 11.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; }
+  .foot-name { color: var(--text); font-size: 13.5px; }
+  .social {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    transition: color .2s, border-color .2s;
+  }
+  .social:hover { color: var(--accent); border-color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>ナイトレイン読み上げ辞書</h1>
+  <p class="lead">ELDEN RING NIGHTREIGN の配信でよく出てくる用語を、わんコメの読み上げが正しく読めるようにするためのクラウドユーザー辞書です。わんコメに辞書のURLを登録するだけで使えます。</p>
+  <p class="count" id="count" hidden>現在 <b id="count-n"></b> 語を収録しています。</p>
+
+  <h2>設定方法</h2>
+  <ol class="steps">
+    <li>
+      <p>わんコメの右上にある「…」メニューから「辞書」を開きます。</p>
+      <img class="shot" src="images/setting-menu.jpg" width="756" height="685" alt="わんコメ右上の「…」メニューを開き、「辞書」を選んでいる画面">
+    </li>
+    <li>
+      <p>辞書ウィンドウの「読み上げ」タブで「クラウドユーザー辞書を使用する」にチェックを入れます。</p>
+    </li>
+    <li>
+      <p>「辞書URL」の欄に、次のURLを1行追加します。すでに書かれているURLは消さずに、改行して下に足してください。</p>
+      <div class="urlbox">
+        <input type="text" id="dict-url" readonly value="https://raw.githubusercontent.com/esusan/nightreign-dict/main/nightreign.json" aria-label="辞書URL">
+        <button type="button" id="copy">コピー</button><span class="copied" id="copied" hidden>コピーしました</span>
+      </div>
+      <img class="shot" src="images/dictionary-url.jpg" width="883" height="958" alt="辞書ウィンドウの読み上げタブで、クラウドユーザー辞書を使用するにチェックを入れ、辞書URL欄の最後にURLを追加した画面">
+    </li>
+  </ol>
+  <p>設定したあと、わんコメが辞書を読み込み直したタイミング（起動したときなど）で反映されます。辞書に単語が追加されたときも、同じタイミングで自動的に新しい内容になります。</p>
+
+  <h2>反映されないとき</h2>
+  <dl>
+    <dt>わんコメを再起動しても読み方が変わらない</dt>
+    <dd>わんコメ 9.0.5 以前には、再起動したときに辞書URLの設定が正しく読み込まれない不具合がありました。9.0.6（2026/07/19公開）で直っています。まず<a href="https://onecomme.com/docs/guide/update" target="_blank" rel="noopener noreferrer">わんコメを最新版に更新</a>してください。</dd>
+    <dt>URLを入れたのに何も変わらない</dt>
+    <dd>「クラウドユーザー辞書を使用する」にチェックが入っているか確認してください。URLの前後に空白が入っていないかも確認してください。</dd>
+  </dl>
+
+  <h2>単語の追加・修正のお願い</h2>
+  <p>追加してほしい単語や、読み間違えている単語を見つけたら、<a href="https://x.com/u_se_nr" target="_blank" rel="noopener noreferrer">X（@u_se_nr）</a>まで気軽に教えてください。</p>
+
+  <h2>ご利用について</h2>
+  <p>配信で使うときに許可は不要です。ご自由にお使いください。</p>
+
+  <footer>
+    <div class="foot-links">
+      <span class="foot-label">作成者</span>
+      <span class="foot-name">えすさん</span>
+      <a class="social" href="https://x.com/u_se_nr" target="_blank" rel="noopener noreferrer" title="X" aria-label="X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      <a class="social" href="https://www.youtube.com/@%E3%81%88%E3%81%99%E3%81%95%E3%82%93-0" target="_blank" rel="noopener noreferrer" title="YouTube" aria-label="YouTube"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.13-2.14C19.51 3.5 12 3.5 12 3.5s-7.51 0-9.37.56A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.13 2.14C4.49 20.5 12 20.5 12 20.5s7.51 0 9.37-.56a3.02 3.02 0 0 0 2.13-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.4 3.6z"/></svg></a>
+    </div>
+    <p>※この辞書は個人が作った非公式のものです。ゲームの開発元・販売元、わんコメ（OneComme）の開発元とは関係ありません。</p>
+  </footer>
+</main>
+
+<script>
+  // 収録語数は辞書ファイルから数える（ページの数字が古くならないように）
+  fetch('nightreign.json', { cache: 'no-cache' })
+    .then((r) => r.json())
+    .then((rows) => {
+      if (!Array.isArray(rows)) return
+      document.getElementById('count-n').textContent = rows.length.toLocaleString('ja-JP')
+      document.getElementById('count').hidden = false
+    })
+    .catch(() => {})
+
+  document.getElementById('copy').addEventListener('click', async () => {
+    const input = document.getElementById('dict-url')
+    try {
+      await navigator.clipboard.writeText(input.value)
+    } catch {
+      input.select(); document.execCommand('copy')
+    }
+    const done = document.getElementById('copied')
+    done.hidden = false
+    setTimeout(() => { done.hidden = true }, 1500)
+  })
+</script>
+</body>
+</html>
