@@ -88,6 +88,43 @@
   dt { font-weight: 700; margin-top: 14px; }
   dd { margin: 4px 0 0; color: var(--muted); }
 
+  /* 登録している単語の一覧 */
+  .words-tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .words-tools input {
+    flex: 1 1 280px;
+    min-width: 0;
+    background: #0f1114;
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 9px 12px;
+    font: inherit;
+  }
+  .words-tools input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  .words-count { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .words-box {
+    max-height: 520px;
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+  }
+  .words { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .words th {
+    position: sticky;
+    top: 0;
+    background: #262a31;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 12.5px;
+    text-align: left;
+    padding: 8px 14px;
+  }
+  .words td { padding: 6px 14px; border-top: 1px solid var(--line); vertical-align: top; }
+  .words td:first-child { width: 50%; color: var(--text); }
+  .words td:last-child { color: var(--muted); }
+  .words .words-empty { color: var(--muted); text-align: center; padding: 20px; }
+
   footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12.5px; line-height: 1.8; }
   footer p { margin: 12px 0 0; }
   .foot-links { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 36px; }
@@ -153,6 +190,19 @@
   <h2>ご利用について</h2>
   <p>配信で使うときに許可は不要です。ご自由にお使いください。</p>
 
+  <h2 id="words-h">登録している単語</h2>
+  <p>この辞書に入っている単語と読み方の一覧です。表記でも読みでも探せます。</p>
+  <div class="words-tools">
+    <input type="search" id="words-q" placeholder="単語や読みで探す（例：追跡者、ついせき）" aria-label="単語や読みで探す" autocomplete="off">
+    <span class="words-count" id="words-count" aria-live="polite"></span>
+  </div>
+  <div class="words-box">
+    <table class="words" aria-labelledby="words-h">
+      <thead><tr><th scope="col">表記</th><th scope="col">読み</th></tr></thead>
+      <tbody id="words-body"><tr><td colspan="2" class="words-empty">読み込んでいます…</td></tr></tbody>
+    </table>
+  </div>
+
   <footer>
     <div class="foot-links">
       <span class="foot-label">作成者</span>
@@ -166,15 +216,43 @@
 </main>
 
 <script>
-  // 収録語数は辞書ファイルから数える（ページの数字が古くならないように）
+  // 収録語数と単語の一覧は辞書ファイルから作る（ページの内容が古くならないように）
+  const wordsBody = document.getElementById('words-body')
+  const wordsQ = document.getElementById('words-q')
+  const wordsCount = document.getElementById('words-count')
+  let words = []
+
+  // 探すときはカタカナをひらがなにそろえ、英字は小文字にする（「ツイセキ」でも「ついせき」に当たるように）
+  const norm = (s) => s.normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60))
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+
+  function renderWords() {
+    const q = norm(wordsQ.value.trim())
+    const hits = q ? words.filter((w) => w.key.includes(q)) : words
+    wordsCount.textContent = q ? `${hits.length.toLocaleString('ja-JP')}件 / ${words.length.toLocaleString('ja-JP')}件` : `${words.length.toLocaleString('ja-JP')}件`
+    if (!hits.length) {
+      wordsBody.innerHTML = '<tr><td colspan="2" class="words-empty">見つかりませんでした。追加してほしい単語は X で教えてください。</td></tr>'
+      return
+    }
+    wordsBody.innerHTML = hits.map((w) => `<tr><td>${esc(w.word)}</td><td>${esc(w.yomi)}</td></tr>`).join('')
+  }
+
   fetch('nightreign.json', { cache: 'no-cache' })
     .then((r) => r.json())
     .then((rows) => {
       if (!Array.isArray(rows)) return
       document.getElementById('count-n').textContent = rows.length.toLocaleString('ja-JP')
       document.getElementById('count').hidden = false
+      words = rows
+        .filter((r) => Array.isArray(r) && r.length >= 2)
+        .map(([word, yomi]) => ({ word: String(word), yomi: String(yomi), key: norm(word + '\n' + yomi) }))
+      renderWords()
     })
-    .catch(() => {})
+    .catch(() => {
+      wordsBody.innerHTML = '<tr><td colspan="2" class="words-empty">一覧を読み込めませんでした。ページを読み込み直してください。</td></tr>'
+    })
+
+  wordsQ.addEventListener('input', renderWords)
 
   document.getElementById('copy').addEventListener('click', async () => {
     const input = document.getElementById('dict-url')
