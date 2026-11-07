@@ -11,6 +11,8 @@
 <meta property="og:description" content="ナイトレインの配信でよく出る用語を、わんコメの読み上げが正しく読めるようにする辞書です。URLを登録するだけで使えます。">
 <meta property="og:url" content="https://esusan.github.io/nightreign-dict/">
 <meta name="twitter:card" content="summary">
+<link rel="icon" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 <style>
   :root {
     --bg: #14161a;
@@ -84,6 +86,7 @@
     cursor: pointer;
   }
   .copied { color: var(--accent); margin-left: 4px; font-size: 13px; }
+  .muted-note { color: var(--muted); font-size: 13px; }
 
   dt { font-weight: 700; margin-top: 14px; }
   dd { margin: 4px 0 0; color: var(--muted); }
@@ -109,6 +112,13 @@
     border-radius: 8px;
     background: var(--panel);
   }
+  /* スクロールバーは細く、地の色になじませる（マウスを乗せたときだけ少し明るく） */
+  .words-box { scrollbar-width: thin; scrollbar-color: #3a3f48 transparent; }
+  .words-box:hover { scrollbar-color: #545b66 transparent; }
+  .words-box::-webkit-scrollbar { width: 8px; height: 8px; }
+  .words-box::-webkit-scrollbar-track { background: transparent; }
+  .words-box::-webkit-scrollbar-thumb { background: #3a3f48; border-radius: 999px; border: 2px solid var(--panel); }
+  .words-box:hover::-webkit-scrollbar-thumb { background: #545b66; }
   .words { width: 100%; border-collapse: collapse; font-size: 14px; }
   .words th {
     position: sticky;
@@ -189,6 +199,11 @@
 
   <h2>ご利用について</h2>
   <p>配信で使うときに許可は不要です。ご自由にお使いください。</p>
+  <p class="muted-note">必須ではありませんが、概要欄などでこのページを紹介してもらえると嬉しいです。</p>
+  <div class="urlbox">
+    <input type="text" id="credit" readonly value="ナイトレイン読み上げ辞書 https://esusan.github.io/nightreign-dict/" aria-label="紹介文">
+    <button type="button" id="credit-copy">コピー</button><span class="copied" id="credit-copied" hidden>コピーしました</span>
+  </div>
 
   <h2 id="words-h">登録している単語</h2>
   <p>この辞書に入っている単語と読み方の一覧です。表記でも読みでも探せます。</p>
@@ -254,17 +269,22 @@
 
   wordsQ.addEventListener('input', renderWords)
 
-  document.getElementById('copy').addEventListener('click', async () => {
-    const input = document.getElementById('dict-url')
-    try {
-      await navigator.clipboard.writeText(input.value)
-    } catch {
-      input.select(); document.execCommand('copy')
-    }
-    const done = document.getElementById('copied')
-    done.hidden = false
-    setTimeout(() => { done.hidden = true }, 1500)
-  })
+  // コピーボタン（辞書URLと紹介文）
+  function copyButton(buttonId, inputId, doneId) {
+    document.getElementById(buttonId).addEventListener('click', async () => {
+      const input = document.getElementById(inputId)
+      try {
+        await navigator.clipboard.writeText(input.value)
+      } catch {
+        input.select(); document.execCommand('copy')
+      }
+      const done = document.getElementById(doneId)
+      done.hidden = false
+      setTimeout(() => { done.hidden = true }, 1500)
+    })
+  }
+  copyButton('copy', 'dict-url', 'copied')
+  copyButton('credit-copy', 'credit', 'credit-copied')
 </script>
 <script>
   // アクセス数の集計（GoatCounter。えすさんの他のページと同じサイトに /nightreign-dict/ として送る）
